@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>구구단</title>
+  <!-- 개발버전, 도움되는 콘솔 경고를 포함. -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+  <div id="root">
+    <!-- html의 속성으로 데이터를 사용하려면 v-어쩌고="data속성명" -->
+    <!-- html의 텍스트노드로 데이터를 사용하려면 중괄호 두번 사이에 데이터 속성을 넣는다 -->
+
+    <!-- <div>{{first + second}} 곱하기 {{second}}는?</div> -->
+    <!-- 이런식으로 {{}}안에는 자바스크립트 식을 쓸 수 있고, {{}}안에는 최종 결과물인 문자열이 들어간다 -->
+
+    <div>{{first}} 곱하기 {{second}}는?</div>
+    <form v-on:submit="onSubmitForm">
+      <!-- v-model을 통해 입력한 값이 vue의 data에 실시간으로 반영된다 (양방향 바인딩)-->
+      <input type="number" v-model="value" ref="answer">
+      <button>입력</button>
+      <!-- 내가 입력한 값 == value, value 확인하기 -->
+      <!-- <div>{{value}}</div> -->
+    </form>
+    <div id="result">{{result}}</div>
+  </div>
+
+  <script>
+    const app = new Vue({
+      el: '#root',
+      data: {
+        first: Math.ceil(Math.random()*9),
+        second: Math.ceil(Math.random()*9),
+        value: '',
+        result: ''
+      },
+      methods: {
+        // 함수에서 data에 접근하려면 
+        // a() {
+        //   this.first 
+        // }
+        onSubmitForm(e) {
+          // form태그가 기본적으로 하는 페이지 새로고침을 막기 위해서
+          e.preventDefault();
+          // console.log(this); // data나 methods가 this 안에 들어있는 것을 확인할 수 있다
+          // console.log(this.first, this.second, this.value);
+          // console.log(this.first, this.second, parseInt(this.value));
+          if(this.first * this.second === parseInt(this.value)) {
+            this.result = '정답!';
+            this.first = Math.ceil(Math.random()*9);
+            this.second = Math.ceil(Math.random()*9);
+            this.value = '';
+            this.$refs.answer.focus();
+          } else {
+            this.result = '땡!';
+            this.value = '';
+            this.$refs.answer.focus();
+          }
+          // 이렇게 하면 문제는 풀 수 있으나 새로운 문제가 나오지 않는다
+          // 우리는 화면을 바꿀 필요가 화면을 손 댈 필요가 절대 없다!
+          // 데이터만 손대야 한다. 데이터만 수정한다.
+          // 이벤트가 발생했을 때 '무엇이 바뀌는지'를 생각해야한다.
+
+          // ui적 플러스알파: 문제를 틀렸을 때 input창이 자동으로 포커스 되어서 또 마우스를 가져다 댈 필요 없게 만들자
+          // 태그에 직접 접근하려면 ref를 사용한다
+          // ref="answer"이라고 작성했을 때 해당 태그의 이름은 answer이 된다고 생각하자
+          // 이 태그에 접근하려면 this.$refs.answer 형식으로 작성한다
+          // ref를 남용해서는 안된다.
+          // ref를 이용해 화면의 데이터를 수정하면 안된다. -> 화면과 데이터가 불일치할 수 있기 때문
+          // ref는 데이터가 아닌 이유로 요소에 접근해야할 때 사용하자
+        }
+      }
+    });
+  </script>
+</body>
+</html>

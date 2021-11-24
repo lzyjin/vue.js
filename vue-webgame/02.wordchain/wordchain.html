@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>끝말잇기</title>
+  <!-- 개발버전, 도움되는 콘솔 경고를 포함. -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+  <!-- html태그를 먼저 만들고, 바뀌는 부분을 data로 만들어라 -->
+  <div id="root">
+    <div>{{word}}</div>
+    <form v-on:submit="onSubmitForm">
+      <input type="text" v-model="value" ref="input">
+      <button type="submit">입력</button>
+    </form>
+    <div>{{result}}</div>
+  </div>
+
+  <script>
+    // vue에게 태그 통제권을 넘긴다
+    const app = new Vue({
+      el: '#root',
+      data: {
+        word: '수박',
+        value: '',
+        result: ''
+      },
+      methods: {
+        onSubmitForm(e) {
+          e.preventDefault();
+          // 이렇게 쓸 수 있는것을 이제 알았네...
+          // console.log(this.word[this.word.length - 1]); // 마지막 어절
+          // console.log(this.value[0]); // 첫번째 어절
+          // if(this.word.substring(this.word.length-1) === this.value.substring(0, 1)) {
+          if(this.word[this.word.length - 1] === this.value[0]) {
+            this.result = '굳';
+            this.word = this.value;
+            this.value = '';
+            this.$refs.input.focus();
+          } else {
+            this.result = '다시해봐';
+            this.value = '';
+            this.$refs.input.focus();
+          }
+        }
+      }
+    });
+    // 그렇다면 화면은 어떻게 바꾸나?
+    // v-if와 v-else, v-show를 사용하면 된다
+    // 모든 화면(요소)를 미리 만들어놓고 v-if나 v-else를 사용해서 적절히 보여주고 가린다
+    // 모든 페이지와 모든 화면을 한곳에 다 만들면 너무 코드의 양이 방대해지므로
+    // 싱글페이지 어플리케이션은 새로운 사고방식을 적용했고, 그에따른 문제도 존재한다 
+    // 그걸 해결하기 위한 방법도 알아야한다
+
+    // vue의 원리: 화면을 다 만들어놓고 데이터만 바꾼다. 데이터를 바꾸면 화면도 바뀐다. 
+  </script>
+</body>
+</html>
