@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>끝말잇기 - 컴포넌트가 없다면</title>
+  <!-- 개발버전, 도움되는 콘솔 경고를 포함. -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+  <!-- 만약 세개의 각각 동작하는 끝말잇기 게임을 만들고 싶다면 똑같은 코드를 중복해야한다 -->
+  <!-- 프로그래밍에서 중요한것은 중복을 줄이는 것 -->
+  <!-- 반복되는 부분을 컴포넌트로 만든다 -->
+  <!-- 반복되는 최소 단위를 하나의 컴포넌트로 만든다 -->
+  <div id="root">
+
+    <div>{{word1}}</div>
+    <form v-on:submit="onSubmitForm1">
+      <input type="text" v-model="value1" ref="input">
+      <button type="submit">입력</button>
+    </form>
+    <div>{{result1}}</div>
+
+    <div>{{word2}}</div>
+    <form v-on:submit="onSubmitForm2">
+      <input type="text" v-model="value2" ref="input">
+      <button type="submit">입력</button>
+    </form>
+    <div>{{result2}}</div>
+
+    <div>{{word3}}</div>
+    <form v-on:submit="onSubmitForm3">
+      <input type="text" v-model="value3" ref="input">
+      <button type="submit">입력</button>
+    </form>
+    <div>{{result3}}</div>
+
+  </div>
+
+  <script>
+    // new Vue 를 사용하면 vue instance
+    const app = new Vue({
+      el: '#root',
+      data: {
+        word1: '수박',
+        word2: '개발',
+        word3: '오징어',
+        value1: '',
+        value2: '',
+        value3: '',
+        result1: '',
+        result2: '',
+        result3: ''
+      },
+      methods: {
+        onSubmitForm1(e) {
+          e.preventDefault();
+          if(this.word[this.word.length - 1] === this.value[0]) {
+            this.result = '굳';
+            this.word = this.value;
+            this.value = '';
+            this.$refs.input.focus();
+          } else {
+            this.result = '다시해봐';
+            this.value = '';
+            this.$refs.input.focus();
+          }
+        },
+        onSubmitForm2(e) {
+          e.preventDefault();
+          if(this.word[this.word.length - 1] === this.value[0]) {
+            this.result = '굳';
+            this.word = this.value;
+            this.value = '';
+            this.$refs.input.focus();
+          } else {
+            this.result = '다시해봐';
+            this.value = '';
+            this.$refs.input.focus();
+          }
+        },
+        onSubmitForm3(e) {
+          e.preventDefault();
+          if(this.word[this.word.length - 1] === this.value[0]) {
+            this.result = '굳';
+            this.word = this.value;
+            this.value = '';
+            this.$refs.input.focus();
+          } else {
+            this.result = '다시해봐';
+            this.value = '';
+            this.$refs.input.focus();
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

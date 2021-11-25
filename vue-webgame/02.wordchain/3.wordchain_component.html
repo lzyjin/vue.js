@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>끝말잇기 - 컴포넌트 사용</title>
+  <!-- 개발버전, 도움되는 콘솔 경고를 포함. -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+  <!-- 만약 세개의 각각 동작하는 끝말잇기 게임을 만들고 싶다면 똑같은 코드를 중복해야한다 -->
+  <!-- 프로그래밍에서 중요한것은 중복을 줄이는 것 -->
+  <!-- 반복되는 부분을 컴포넌트로 만든다 -->
+  <!-- 반복되는 최소 단위를 하나의 컴포넌트로 만든다 -->
+  <!-- 컴포넌트는 같은 것을 랜더링(화면에 표시함)하지만 중복을 제거하고, 데이터는 별개이다 -->
+  <div id="root">
+    <word-chain></word-chain>
+    <word-chain></word-chain>
+    <word-chain></word-chain>
+  </div>
+
+  <!-- component는 instance보다는 위에 -->
+  <!-- script는 div#root보다는 아래에 -->
+  <script>
+    // vue component (전역 컴포넌트, global component)
+    Vue.component('word-chain', {
+      // 컴포넌트의 template은 항상 최상위태그로 묶어져서 하나의 태그덩어리여야 한다.
+      // 아래를 최상위 <div>로 묶지 않으면 에러가 발생한다
+      template: `
+        <div>
+          <div>{{word}}</div>
+          <form v-on:submit="onSubmitForm">
+            <input type="text" v-model="value" ref="input">
+            <button type="submit">입력</button>
+          </form>
+          <div>{{result}}</div>
+        </div>
+      `,
+      // component를 만들 때는 data의 수정사항이 있다
+      // vue instance를 만들때 data는 객체형식으로 표현해 줬는데, vue component에서는 함수로 작성해야한다
+      // 컴포넌트는 여러번 사용되는것을 전제로 하고있기 때문에 데이터가 각 컴포넌트마다 달라야한다
+      // 그래서 새로운 객체를 만들어서 리턴하는 data라는 함수로 사용하는 것
+      data() {
+        return {
+          word: '수박',
+          value: '',
+          result: ''
+        }
+      }, 
+      methods: {
+        onSubmitForm(e) {
+          e.preventDefault();
+          if(this.word[this.word.length - 1] === this.value[0]) {
+            this.result = '굳';
+            this.word = this.value;
+            this.value = '';
+            this.$refs.input.focus();
+          } else {
+            this.result = '다시해봐';
+            this.value = '';
+            this.$refs.input.focus();
+          }
+        }
+      }
+    });
+  </script>
+
+  <script>
+    // new Vue 를 사용하면 vue instance
+    const app = new Vue({
+      el: '#root',
+      data: {},
+      methods: {}
+    });
+  </script>
+</body>
+</html>

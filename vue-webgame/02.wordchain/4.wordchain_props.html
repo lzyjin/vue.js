@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>끝말잇기 - props와 웹팩의 필요성</title>
+  <!-- 개발버전, 도움되는 콘솔 경고를 포함. -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+  <!-- component로 같은것을 랜더링하지만 살짝씩 차이를 주기 위해 props를 사용한다 -->
+  <!-- component는 중복을 피하고 재사용하기 위해 사용하지만, 달라지는 부분들은 props로 넣어주면 된다 -->
+  <!-- vue의 html부분에서는 cabab-case를 사용해라. 자바스크립트 단에서는 이것을 camelCase로 알아서 바꿔준다 -->
+
+  <!-- 프로젝트 규모가 커지다보면 스크립트가 더 많아지고 길어지는데, 그럴때 js파일로 분리해서 하면 그 파일들간의 순서도 중요하고, 관리하기가 힘들어진다. webpack이 그걸 하나로 합쳐줘서 해결해준다 -->
+  <div id="root">
+    <word-chain start-word="수박"></word-chain>
+    <word-chain start-word="개발"></word-chain>
+    <word-chain start-word="오징어"></word-chain>
+  </div>
+
+  <script>
+    // vue component (전역 컴포넌트, global component)
+    Vue.component('wordChain', {
+      template: `
+        <div>
+          <div>{{word}}</div>
+          <form v-on:submit="onSubmitForm">
+            <input type="text" v-model="value" ref="input">
+            <button type="submit">입력</button>
+          </form>
+          <div>{{result}}</div>
+        </div>
+      `,
+      // startWord 속성의 값을 받아온다
+      props: ['startWord'],
+      data() {
+        console.log(this);
+        return {
+          // word: '수박',
+          word: this.startWord,
+          value: '',
+          result: ''
+        }
+      }, 
+      methods: {
+        onSubmitForm(e) {
+          e.preventDefault();
+          if(this.word[this.word.length - 1] === this.value[0]) {
+            this.result = '굳';
+            this.word = this.value;
+            this.value = '';
+            this.$refs.input.focus();
+          } else {
+            this.result = '다시해봐';
+            this.value = '';
+            this.$refs.input.focus();
+          }
+        }
+      }
+    });
+  </script>
+
+  <script>
+    // vue instance
+    const app = new Vue({
+      el: '#root',
+      data: {},
+      methods: {}
+    });
+  </script>
+</body>
+</html>
