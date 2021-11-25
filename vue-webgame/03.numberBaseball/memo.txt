@@ -1,9 +1,12 @@
+3-1 웹팩 사용하기 -----------------------------
+
 script가 많아지다보니까 webpack을 배우는 어려움보다 script를 관리하는 어려움이 더 커졌을 때 webpack의 필요성이 대두된다.
 
 webpack을 사용하려면 node.js가 필요하다.
 안정적인 LTS버전을 설치할 것을 추천.
 
-node.js를 제ㅔ대로 설치했다면 현재경로에서 terminal을 열어 node -v 로 버전을 확인.
+node.js를 제대로 설치했다면 현재경로에서 terminal을 열어 node -v 로 버전을 확인.
+현재 2111224 node.js 버전은 v16.8.0, npm버전은 7.21.0, vue버전은 @vue/cli 4.5.13ㅈㄷ
 node.js를 설치하면 따라오는 npm이라는 것이 있는데, 이게 뭐냐면 남이 만든 javascript 코드를 쓸 수 있게 하는 것.
 
 node와 npm을 설치하면 남이 만든 자바스크립트 코드를 가져다 쓸 수 있다. 
@@ -28,7 +31,7 @@ module.exports={} : node에 모듈을 만든다는 뜻
 이 객체안에 웹팩 설정을 다 넣으면 된다
 
 웹팩설정은 크게 4개로 생각해라.
-entry, module, plugin, output, 이 네가지가 주가되고, 나머지는 부가적인 것이다.
+entry, module, plugins, output, 이 네가지가 주가되고, 나머지는 부가적인 것이다.
 이 4가지의 순서는 이해를 돕기위한 순서. 
 
 무언가를 사용할 때 그걸 왜 쓰는지 아는게 중요하다.
@@ -52,3 +55,170 @@ output: {
     path: './dist'
   }
 나중에 dist라는 폴더가 생기고, 그 안에 app.js가 최종결과물로 나올 것이다.
+
+html파일에서 script로 작성했던 코드들을 
+<script src="/dist/app.js"></script> 
+이 파일 하나로 다 불러온다.
+
+module이 webpack의 핵심이다.
+
+
+3-2 프로젝트 구조와 웹팩 빌드 -----------------------------
+main.js에 
+
+import Vue from 'vue';
+new Vue().$mount('#root');
+
+윗줄은 설치한 vue를 가져오는 문법.(명시적으로 package.json에 기록한 vue를 사용할것이라고 밝힘)
+import한 다음에는 vue를 사용할 수 있다 (vue 인스턴스를 생성할 수 있다.)
+
+03.numberBaseball 폴더에 number-baseball.vue 파일 추가
+
+vue파일은 확장자가 .vue이지만 자바스크립트 파일이라고 생각하면 된다.
+
+기존의 html파일안의 <script>태그 안에서 정의한 vue component 부분이 지금은 number-baseball.vue 가 된 것.
+
+컴포넌트를 코딩하는 vue파일은 크게 <template></template>, <script></script>, <style></style> 로 되어있다.
+독특한 구조로 되어있는데 이건 html이 아니라 특수한 문법을 사용하는 자바스크립트이다. 
+
+vue 컴포넌트를 .vue라는 별개의 파일로 분리할 수 있게 되었다.
+
+html파일이 있고 자바스크립트파일은 main.js와 number-baseball.js가 있는데, main.js와 number-baseball.js를 합쳐서 dist폴더안의 app.js로 만들어줘야 이 html이 완성된다(제대로 돌아간다).
+
+dist폴더안에 아무것도 없는 이유는 webpack이 아직 안만들어줘서 그렇다.
+
+webpack을 실행시키려면 package.json에 가서 
+ "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+를 
+"scripts": {
+    "build": "webpack"
+  },
+으로 바꾸고(value에 webpack이라고 적어야 웹팩을 실행시킬 수 있다)
+
+터미널을 열어서 npm run build (build는 package.json에서 "script"안에 있는 키)를 치면 웹팩이 실행된다. 
+
+근데 명령어를 치니 에러 발생. 같이 해결해나가자. (휴 다행이다. 나만 에러난게 아니라서)
+
+에러
+-configuration.output.path: The provided value "./dist" is not an absolute path!
+-> The output directory as **absolute path** (required).
+: path가 절대경로가 아니래
+
+하지만 절대경로를 일일이 다 치자니 너무 힘드니 node가 도와주는 모듈을 사용하자. 
+
+webpack.config.js 파일 상단에
+const path = require('path');
+라고 적고, 
+
+output: {
+    filename: 'app.js', 
+    path: path.join(__dirname, 'dist')
+}
+path를 이렇게 고쳐주자.
+__dirname은 현재 webpack.config.js가 있는 폴더이름이 03.number-baseball이고, 이 폴더 안에 있는 dist폴더. 
+
+entry: {
+    app: './main.js'
+},
+도 
+entry: {
+    app: path.join(__dirname, 'main.js')
+},
+로 고칠 수 있다. 
+
+다시 npm run build를 해보면 에러가 안난다.
+사실 에러가 나야하는데 안나는것이라
+main.js에 
+import Vue from 'vue';
+import NumberBaseball from './number-baseball.vue';
+new Vue().$mount('#root');
+
+두번째 줄을 추가해준다.
+이렇게 해야 vue 파일이 main.js로 합쳐질 수 있다.
+main.js에 다른 js들을 import해서 연결하고 있는 것. (main.js에 합쳐짐)
+
+npm run build -> 에러남. 에러나는게 당연함.
+왜냐? 웹팩이 main.js를 딱 켜서 vue를 불러오고, number-baseball.vue를 불러오려고 하는 순간 얘는 자바스크립트가 아니라서 에러가 난다. 
+
+이 때 필요한것이 webpack.config.js에서 rules이다.
+
+module: {
+    rules: [{
+      test: /\.vue$/,
+      loader: 'vue-loader',
+    }]
+  },
+
+이 때 /\.vue$/는 정규표현식으로 .vue로 끝나는 파일을 의미하고, vue-loader는 남이 만든 코드라서 다운받아야한다.
+
+npm i vue-loader -D
+
+중간에 설치 취소하려면 ctrl c
+
+제대로 설치되었나 확인은 package.json에서 확인가능. 
+devDependencies에서 vue-loader가 추가되었다.
+
+.vue 파일은 웹팩이 처리하는게 아니라 vue-loader가 처리한다.
+웹팩은 기본적으로 자바스크립트만 처리하므로, webpack.config.js를 보면 rules에 적어둔대로 .vue파일은 vue-loader가 처리하도록 설정했기 때문이다.
+
+npm run build 하면 에러난다.
+
+- 에러 vue-loader was used without the corresponding plugin. Make sure to include VueLoaderPlugin in your webpack config.
+: VueLoaderPlugin 플러그인을 설치해라
+
+webpack.config.js 최상단에 
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+추가,
+plugins: [
+    new VueLoaderPlugin(),
+  ],
+추가
+
+여기서 궁금한점! 남의 코드 불러올 때 어떤건 import, 어떤건 require로 불러오는가?
+vue환경에서는 import로 불러오고, node환경에서는(웹팩) require로 불러온다.
+
+- 에러 [vue-loader] vue-template-compiler must be installed as a peer dependency, or a compatible compiler implementation must be passed via options.
+: vue-template-compiler 를 설치해라
+
+npm i vue-template-compiler -D 
+
+설치하고
+package.json에서 "vue-template-compiler"의 버전과 "vue"의 버전이 동일한지 확인해라.
+
+나중에 vue의 버전을 더 높은걸 깔면, vue-template-compiler의 버전도 올려줘야하는데 어떻게 하냐면, 
+npm i vue@2.7.0 과 같이 @뒤에 특정 버전을 적어주면 된다. @를 안쓰고 npm i vue 하면 최신 버전으로 설치된다. 
+
+npm run build
+
+에러 없고, dist 폴더안에 app.js 가 생긴다. 
+
+이제 webpack.config.js에 기타 옵션을 넣어보자.
+
+mode: 'development' (개발시), 'production' (배포시)
+devtool: 'eval' (개발시), 'hidden-source-map' (배포시) 많이 쓴다
+eval을 쓰면 웹팩이 빌드하는 속도가 빨라진다.
+resolve: {
+    extensions: ['.js', '.vue']
+  }
+extensions를 쓰면 확장자들을 처리해줄 수 있다.
+그게 무슨뜻이냐면 main.js에서 import할 때
+import NumberBaseball from './number-baseball.vue';
+에서 .vue를 생략할 수 있다.
+import NumberBaseball from './number-baseball';
+이렇게.
+그리고 number-baseball.vue가 메인 컴포넌트이기때문에 main.js에서 vue 인스턴스를 만드는 부분에 이 컴포넌트를 연결해줘야한다.
+new Vue(NumberBaseball).$mount('#root'); 이렇게
+
+하나라도 새로 추가하거나 수정하면 build를 다시 해야하므로
+npm run build
+
+휴.. 에러 없다
+
+dist폴더안에 있는 app.js 의 내용은 사실 몰라도 된다. 웹팩이 만들어준거기때문에 믿고 쓰는것. 
+
+html에서 app.js의 경로를 상대경로로 바꿔주자
+<script src="./dist/app.js"></script> 이렇게
+
+끝.
