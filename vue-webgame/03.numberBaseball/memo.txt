@@ -6,7 +6,7 @@ webpack을 사용하려면 node.js가 필요하다.
 안정적인 LTS버전을 설치할 것을 추천.
 
 node.js를 제대로 설치했다면 현재경로에서 terminal을 열어 node -v 로 버전을 확인.
-현재 2111224 node.js 버전은 v16.8.0, npm버전은 7.21.0, vue버전은 @vue/cli 4.5.13ㅈㄷ
+현재 2111224 node.js 버전은 v16.8.0, npm버전은 7.21.0, vue버전은 @vue/cli 4.5.13
 node.js를 설치하면 따라오는 npm이라는 것이 있는데, 이게 뭐냐면 남이 만든 javascript 코드를 쓸 수 있게 하는 것.
 
 node와 npm을 설치하면 남이 만든 자바스크립트 코드를 가져다 쓸 수 있다. 
@@ -26,9 +26,9 @@ webpack 설치는 명령어 npm i webpack webpack-cli -D (D는 옵션, 개발할
 현재 폴더에 webpack.config.js 파일을 생성한다.
 webpack.config.js에는 webpack에 대한 설정을 작성한다.
 
-module.exports={} : node에 모듈을 만든다는 뜻 
+module.exports={} : node에 모듈을 만든다는 뜻.
 {} 이 객체를 웹팩이 웹팩처리를 할 때 사용한다. 그것을 웹팩킹이라고 부르겠다.
-이 객체안에 웹팩 설정을 다 넣으면 된다
+이 객체안에 웹팩 설정을 다 넣으면 된다.
 
 웹팩설정은 크게 4개로 생각해라.
 entry, module, plugins, output, 이 네가지가 주가되고, 나머지는 부가적인 것이다.
@@ -42,7 +42,7 @@ entry: {
     app: './main.js'
   },
 app은 나중에 하나로 합쳐질 파일의 이름. main.js외 스크립트 일동 100개가 하나로 합쳐진 app.js가 된다.
-그것을 output에 작성해준다
+그것을 output에 작성해준다.
 
 output: {
     filename: 'app.js'
@@ -162,6 +162,7 @@ devDependencies에서 vue-loader가 추가되었다.
 
 .vue 파일은 웹팩이 처리하는게 아니라 vue-loader가 처리한다.
 웹팩은 기본적으로 자바스크립트만 처리하므로, webpack.config.js를 보면 rules에 적어둔대로 .vue파일은 vue-loader가 처리하도록 설정했기 때문이다.
+vue-loader는 .vue파일을 발견할 때마다 자바스크립트 파일로 내부적으로 전환한다.
 
 npm run build 하면 에러난다.
 

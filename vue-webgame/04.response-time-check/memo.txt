@@ -1,0 +1,86 @@
+2021.12.01 (수)
+야구게임폴더에 있는 dist와 node-modules를 제외한 파일을 복사해서 현재 폴더에 붙여넣는다.
+현재 폴더에서 npm i를 하면 package.json에 있는 것들 (vue, vue-loader, vue-template-complier, webpack, webpack-cli)들이 설치된다.
+이것들은 node-modules 폴더에 생긴다.
+
+.vue파일의 내용들을 지우고 .git폴더가 있는 경로에 .gitignore 파일을 만들어준다.
+dist와 node_modules를 적어준다.
+node_modules는 너무 무겁기 때문에 깃에 안올리려는 목적이다.
+
+이전 시간에 코드를 수정할 때마다 매번 npm run build를 치느라 수고스러웠다.
+package.json에서 
+"scripts": {
+    "build": "webpack"
+  }
+을
+"scripts": {
+    "build": "webpack --watch"
+  },
+이라고 수정한다.
+
+그러고 npm run build를 하면 그 뒤로부터 vue코드를 수정하면 알아서 빌드해준다.
+
+state라는 속성의 값을 요소의 class로 사용하고 싶으면 요소에
+v-on:class="속성명"이라고 적으면 된다.
+축약형은 :class="속성명"
+
+style을 추가하면 에러가 생긴다
+에러메시지: You may need an additional loader to handle the result of these loaders.
+vue-loader만으로는 스타일을 읽을 수 없나봄.
+
+npm i vue-style-loader -D 
+
+webpack.config.json에 rules를 하나 더 추가해준다.
+
+module: {
+    rules: [{
+      test: /\.vue$/,
+      use: 'vue-loader',
+    }]
+  },
+를
+module: {
+    rules: [{
+      test: /\.vue$/,
+      use: 'vue-loader',
+    }, {
+      test: /\.css$/,
+      use: [
+        'vue-style-loader'
+      ]
+    }]
+  },
+
+css-loader도 추가해줘야한다
+
+use: [
+        'vue-style-loader',
+        'css-loader'
+      ]
+
+webpack.config.json의 module과 plugin의 차이점은 뭔가?
+모듈은 웹팩의 대부분의 역할을 한다. 로더들의 역할은 자바스크립트가 아닌애들(.vue, .css 등)을 자바스크립트로 만들어주는것.
+플러그인은 그 역할은 아니지만 부가적인 역할을 하는 애들.
+결과물(output)이 나오기전에 추가적으로 (압축이라던지) 하는 기능.
+
+style태그에 scoped를 추가하면 이 컴포넌트안에서만 유효한 스타일이 된다. 
+#screen[data-v-2a8ce78a] {
+  width: 300px;
+  height: 200px;
+  text-align: center;
+  user-select: none;
+}
+#screen.waiting[data-v-2a8ce78a] {
+  background-color: aqua;
+}
+#screen.ready[data-v-2a8ce78a] {
+  background-color: red;
+}
+#screen.now[data-v-2a8ce78a] {
+  background-color: greenyellow;
+}
+이런식으로 선택자 뒤에 랜덤속성이 붙는다. 
+template으로 만든 html태그에도 동일한 속성이 붙는다.
+이건 컴포넌트마다 다른 고유코드이다.
+
+그래서 글로벌로(전역으로) 스타일을 적용할때만 scoped를 적지 않고, 나머지는 적는다.
