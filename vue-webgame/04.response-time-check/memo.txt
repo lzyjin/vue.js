@@ -84,3 +84,41 @@ template으로 만든 html태그에도 동일한 속성이 붙는다.
 이건 컴포넌트마다 다른 고유코드이다.
 
 그래서 글로벌로(전역으로) 스타일을 적용할때만 scoped를 적지 않고, 나머지는 적는다.
+
+2021.12.07 (화)
+watch 덕분에 매번 build해주지 않아도 되지만 새로고침은 해줘야한다. 그것마저 귀찮다면 
+npm i -D webpack-dev-server
+웹팩워치의 진화판.!
+
+package.json에 추가해주자
+"scripts": {
+    "build": "webpack --watch"
+  },
+에
+"scripts": {
+    "build": "webpack --watch",
+    "dev": "webpack-dev-server"
+  },
+로 추가해주고,
+터미널에서 실행할 때 npm run dev로 치면 된다 
+
+http://localhost:8080/으로 들어가도 안돼서 상현이 찬스 씀
+
+webpack.config.js에서 
+output: {
+    filename: 'app.js', 
+    path: path.join(__dirname, 'dist'),
+  }
+에 
+devServer :{
+    static:path.join(__dirname,'/')
+  },
+output: {
+    filename: 'app.js', 
+    path: path.join(__dirname, 'dist'),
+    publicPath: "/dist"
+  }
+로 추가
+
+webpack-dev-server를 쓰려면 저 publicPath도 적어야만 작동한다
+
