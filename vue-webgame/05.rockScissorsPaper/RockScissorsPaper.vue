@@ -7,7 +7,7 @@
 
     <!-- imgCoord라는 데이터만 사용하는 것이 아니라 문자열과 붙어있으므로 이런것을 computed로 만든다 => 캐싱효과 -->
     <!-- <div id="computer" :style="{ background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0`}"></div> -->
-    <div id="computer" :style="{ computedStyleObject }"></div>
+    <div id="computer" :style="computedStyleObject"></div>
     <div>
       <button @click="onClickButton('바위')">바위</button>
       <button @click="onClickButton('가위')">가위</button>
@@ -15,6 +15,7 @@
     </div>
     <div>{{result}}</div>
     <div>현재 {{score}}점</div>
+    <!-- <lifecycle-example v-if="true"></lifecycle-example> -->
   </div>
 </template>
 
@@ -23,7 +24,9 @@
     바위: '0',
     가위: '-142px',
     보: '-284px'
-  }
+  };
+
+  let interval = null;
   export default {
     data() {
       return {
@@ -33,16 +36,57 @@
       }
     },
     computed: {
-      computedStyleObject() {
-        return {
-          background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${this.imgCoord} 0`
+      computedStyleObject(){
+          return{
+            background:`url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${this.imgCoord} 0`
+          }
         }
-      }
     },
     methods: {
       onClickButton(choice) {
 
       }
+    },
+    beforeCreate() {
+      console.log('beforeCreate');
+    },
+    created() {
+      // created는 data가 다 준비된 상태로 컴포넌트가 보여지게될 때 (화면에 나타나기 전)
+      // 자바스크립트 상으로만 존재함
+      console.log('created');
+    },
+    beforeMount() {
+      console.log('beforeMount');
+    },
+    mounted() {
+      // mounted는 컴포넌트가 화면에 나타난 후
+      // 화면에 존재함
+      console.log('mounted');
+      // setInterval을 변수에 담아야 나중에 변수로 접근해서 clearInterval할 수 있다 (반복을 멈출 수 있다)
+      interval = setInterval( () => {
+        if( this.imgCoord === rspCoords.바위 ) {
+          this.imgCoord = rspCoords.가위;
+        } else if( this.imgCoord === rspCoords.가위 ) {
+          this.imgCoord = rspCoords.보;
+        } else if( this.imgCoord === rspCoords.보 ) {
+          this.imgCoord = rspCoords.바위;
+        }
+      }, 1000 );
+    },
+    beforeUpdate() {
+      console.log('beforeUpdate');
+    },
+    updated() {
+      // updated는 화면의 데이터가 바뀌어서 화면이 다시 그려질 때
+      console.log('updated');
+    },
+    beforeDestroy() {
+      console.log('beforeDestroy');
+      clearInterval(interval);
+    },
+    destroyed() {
+      // destroyed는 컴포넌트가 화면에서 사라질 때 
+      console.log('destroyed');
     }
   }
 </script>
