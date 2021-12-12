@@ -1,0 +1,22 @@
+2021.12.08 (수)
+vue의 컴포넌트 이름은 두단어 이상으로 지을것을 권고.
+왜냐하면 컴포넌트가 태그가 되니까 한단어로 지으면 html의 태그명과 겹칠 가능성이 있으므로.
+
+저번시간에 dist폴더자체가 안만들어졌는데 어떻게 정상적으로 작동했나?
+(사실 나는 dist폴더가 생겼었다.. 그래서 지워보고 테스트함)
+webpack-dev-server는 output이 dist와같은 폴더에 파일로 저장되는게 아니라 메모리에 저장한다.
+그래서 파일이 눈에 보이지 않아도 잘 작동하는것.
+
+-> webpack.config.js 에 
+output: {
+    filename: 'app.js', 
+    path: path.join(__dirname, 'dist'),
+    publicPath: "/dist"
+  }
+publicPath를 꼭 적어줘야함. 그래야 메모리상에 dist로 접근할 수 있기 때문에
+
+실제 파일을 만들고 싶으면 webpack 명령어를 사용해야한다.
+(나는 npm run build라고 쳐서 나도 모르는 사이에 dist폴더가 생긴듯.)
+
+결론
+webpack-dev-server는 실제파일을 생성하지 않는다
