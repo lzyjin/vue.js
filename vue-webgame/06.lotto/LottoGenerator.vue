@@ -1,129 +1,75 @@
 <template>
   <div>
-    <!-- v-bind:class와 v-bind:style은 조금 독특하다. 값에 객체형식을 넣을 수 있다 -->
-    <!-- state가 true라서 state만 class가 될 수 있다.  -->
-    <!-- 자바스크립트에서 css속성을 사용할 때는 -을 빼기기호로 인식하기때문에 대문자로 바꿔서 카멜케이스로 만들어야한다 -->
-    <!-- <div id="computer" :class="{ state: true, hello: false }" v-bind:style="{ backgroundImage: '', fontSize: '14px' }"></div> -->
-
-    <!-- imgCoord라는 데이터만 사용하는 것이 아니라 문자열과 붙어있으므로 이런것을 computed로 만든다 => 캐싱효과 -->
-    <!-- <div id="computer" :style="{ background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0`}"></div> -->
-    <div id="computer" :style="computedStyleObject"></div>
-    <div>
-      <button @click="onClickButton('바위')">바위</button>
-      <button @click="onClickButton('가위')">가위</button>
-      <button @click="onClickButton('보')">보</button>
+    <div>당첨 숫자</div>
+    <div id="결과창">
+      <lotto-ball v-for="ball in winBalls" v-bind:key="ball.idx" number="5"></lotto-ball>
     </div>
-    <div>{{result}}</div>
-    <div>현재 {{score}}점</div>
-    <!-- <lifecycle-example v-if="true"></lifecycle-example> -->
+    <div>보너스</div>
+    <lotto-ball v-if="bonus"></lotto-ball>
+    <button v-if="redo">한 번 더!</button>
   </div>
 </template>
 
 <script>
-  const rspCoords = {
-    바위: '0',
-    가위: '-142px',
-    보: '-284px'
-  };
-  const scores = {
-    가위: 1,
-    바위: 0,
-    보: -1
-  };
-  const computerChoice =(imgCoord) => {
-    return Object.entries(rspCoords).find( function(v) {
-      return v[1] === imgCoord;
-    } )[0];
-  };
-  let interval = null;
+// 현재 LottoGenerator 컴포넌트가 부모컴포넌트, LottoBall 컴포넌트가 자식컴포넌트
+// 부모컴포넌트에서 자식컴포넌트의 태그부분에 속성처럼 number="5"라고 적으면 
+// 자식컴포넌트에서 props속성으로 number을 받아올 수 있다
+// props: 자식컴포넌트에게 값을 물려주는 것
+
+// LottoGenerator는 로또당첨숫자를 만드는 곳, LottoBall은 당첨숫자를 화면에 표시하는 역할
+// 데이터를 만드는 곳과 데이터를 표시하는 곳이 다르네
+
+import LottoBall from './LottoBall';
+
+function getWinNumbers() {
+  console.log('getWinNumbers');
+  const candidate = Array(45).fill().map((v, i) => i + 1);
+  const shuffle = [];
+  while(candidate.length > 0) {
+    shuffle.push(candidate.splice(Math.floor(Math.random() * candidate.length), 1)[0]);
+  }
+  const bonusNumber = shuffle[shuffle.length - 1];
+  const winNumbers = shuffle.slice(0, 6).sort((p, c) => p - c);
+  return [...winNumbers, bonusNumber];
+}
+
   export default {
+    // 자식컴포넌트를 사용하기위해 불러옴
+    components: {
+      // 'lotto-ball': LottoBall,
+      // 축약형
+      LottoBall
+      // 파스칼케이스를 자동으로 케밥케이스로 바꿔준다 
+      // ( 실제 객체이름과 등록할 이름이 일치할 때만 사용 가능 -> 실무에서는 거의 동일하게 사용하므로 축약형으로 쓰자  )
+    },
     data() {
       return {
-        imgCoord: rspCoords.바위,
-        result: '',
-        score: 0
+        // winNumbers 와 winBalls 이렇게 두개나 쓰는 이유:
+        // 시각적 효과를 위해 winNumbers로 로또번호를 다 뽑아놓고 화면에 하나씩 보여주기 위해
+        winNumbers: getWinNumbers(),
+        winBalls: [],
+        bonus: null,
+        redo: false
       }
     },
     computed: {
-      computedStyleObject(){
-          return{
-            background:`url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${this.imgCoord} 0`
-          }
-        }
+
     },
     methods: {
-      changeHand() {
-        interval = setInterval( () => {
-          if( this.imgCoord === rspCoords.바위 ) {
-            this.imgCoord = rspCoords.가위;
-          } else if( this.imgCoord === rspCoords.가위 ) {
-            this.imgCoord = rspCoords.보;
-          } else if( this.imgCoord === rspCoords.보 ) {
-            this.imgCoord = rspCoords.바위;
-          }
-        }, 100 );
-      },
-      onClickButton(choice) {
-        clearInterval(interval);
-        const myScore = scores[choice];
-        const cpuScore = scores[computerChoice(this.imgCoord)];
-        const diff = myScore - cpuScore;
-        if(diff === 0) {
-          this.result = '비겼습니다';
-        } else if( [-1, 2].includes(diff) ) {
-          this.result = '이겼습니다';
-          this.score += '1';
-        } else {
-          this.result = '졌습니다';
-          this.score -= 1;
-        }
-        setTimeout( () => {
-          this.changeHand();
-        }, 1000 );
-      }
-    },
-    beforeCreate() {
-      console.log('beforeCreate');
-    },
-    created() {
-      // created는 data가 다 준비된 상태로 컴포넌트가 보여지게될 때 (화면에 나타나기 전)
-      // 자바스크립트 상으로만 존재함
-      console.log('created');
-    },
-    beforeMount() {
-      console.log('beforeMount');
+      
     },
     mounted() {
-      // mounted는 컴포넌트가 화면에 나타난 후
-      // 화면에 존재함
-      console.log('mounted');
-      // setInterval을 변수에 담아야 나중에 변수로 접근해서 clearInterval할 수 있다 (반복을 멈출 수 있다)
-      this.changeHand();
-    },
-    beforeUpdate() {
-      console.log('beforeUpdate');
-    },
-    updated() {
-      // updated는 화면의 데이터가 바뀌어서 화면이 다시 그려질 때
-      console.log('updated');
+      for(let i = 0; i < this.winNumbers.length - 1; i++) {
+        setTimeout(() => {
+          this.winBalls.push(this.winNumbers[i]);
+        }, (i + 1) * 1000);
+      } 
     },
     beforeDestroy() {
-      console.log('beforeDestroy');
-      // 중요 
-      // setTimeout이나 setInterval을 끝내야 메모리 누수 문제가 일어나지 않는다
-      clearInterval(interval);
-    },
-    destroyed() {
-      // destroyed는 컴포넌트가 화면에서 사라질 때 
-      console.log('destroyed');
     }
   }
 </script>
 
 <style scoped>
-  #computer {
-    width: 142px;
-    height: 200px;
-    background-position: 0 0;
-  }
+
 </style>
